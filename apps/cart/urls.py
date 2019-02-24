@@ -19,5 +19,5 @@ from django.contrib import admin
 from cart import views
 
 urlpatterns = [
-    url(r'^test/$', views.test),
+    # url(r'^test/$', views.test),
 ]

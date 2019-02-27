@@ -2,9 +2,9 @@ var vm = new Vue({
     el: '#app',
     data: {
         messages: [1,2,3],
-        slide_news: [],
-        top_news: [],
-        image_news: [],
+        carousel_news: [],
+        recommended_news: [],
+        picture_news: [],
         categories: []
     },
 
@@ -16,7 +16,16 @@ var vm = new Vue({
     methods: {
         // 初始化显示顶部的新闻数据
         init_top_news: function () {
-           
+           axios.get('http://127.0.0.1:8000/topnews/')
+               .then(response=>{
+                   console.log(response.data);
+                   vm.carousel_news = response.data.carousel_news;
+                   vm.recommended_news = response.data.recommended_news;
+                   vm.picture_news = response.data.picture_news;
+               })
+               .catch(error=>{
+                   console.log(error.response)
+               })
         },
 
         // 初始化显示类别新闻数据

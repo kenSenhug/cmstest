@@ -5,7 +5,8 @@ var vm = new Vue({
         carousel_news: [],
         recommended_news: [],
         picture_news: [],
-        categories: []
+        category_query_list: [],
+        data_list: []
     },
 
     mounted: function () {
@@ -30,7 +31,15 @@ var vm = new Vue({
 
         // 初始化显示类别新闻数据
         init_category_news: function () {
-           
+           axios.get('http://127.0.0.1:8000/categorynews/')
+               .then(response=>{
+                   console.log(response.data);
+                   vm.data_list = response.data.data_list;
+                   // vm.category_query_list = response.data.category_query_list;
+               })
+               .catch(error=>{
+                   console.log(error.response)
+               })
         },
     },
 

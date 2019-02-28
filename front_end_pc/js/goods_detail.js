@@ -24,14 +24,32 @@ var vm = new Vue({
 
         // 获取商品详情数据
         get_goods_detail: function(id) {
-			//发送请求
+			axios.get(this.host+'/goods/detail/goods='+id+'/')
+            .then(response => {
+
+                   this.goods = response.data['goods'];
+                    // alert(this.recommend_goods);
+
+                })
+                .catch(error => {
+                    console.log("");
+                })
             
         },
 
         // 获取推荐商品
         get_recommend_goods: function () {
 			//发送请求
-            
+            axios.get('http://127.0.0.1:8000/goods/index/')
+            .then(response => {
+
+                   this.recommend_goods = response.data['red_goods'];
+                    // alert(this.recommend_goods);
+
+                })
+                .catch(error => {
+                    console.log("");
+                })
         },
 
         addToCart: function() {

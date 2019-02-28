@@ -19,4 +19,5 @@ from django.contrib import admin
 from cart import views
 
 urlpatterns = [
+    url(r'^cart/$', views.CartView.as_view()),
 ]

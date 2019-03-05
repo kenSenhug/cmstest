@@ -67,8 +67,8 @@
                 })
                 .then(response => {
                     // 设置商品全选或全不选
-                    for (var i=0; i<this.cart.length;i++){
-                        this.cart[i].selected = selected;
+                    for (var i=0; i<this.goods_list.length;i++){
+                        this.goods_list[i].selected = selected;
                     }
                 })
                 .catch(error => {
@@ -80,12 +80,12 @@
         get_cart_goods: function () {
            axios.get(this.host + '/cart/')
             .then(response => {
-                this.cart = response.data;
+                this.goods_list = response.data;
 
                 // 计算每件商品的小计金额: 小计金额 amount = 单价 * 数量
-                for (var i = 0; i < this.cart.length; i++) {
-                    this.cart[i].amount = (parseFloat(this.cart[i].price)
-                        * this.cart[i].count).toFixed(2);  // toFixed： 保留两位小数点
+                for (var i = 0; i < this.goods_list.length; i++) {
+                    this.goods_list[i].amount = (parseFloat(this.goods_list[i].price)
+                        * this.goods_list[i].count).toFixed(2);  // toFixed： 保留两位小数点
                 }
             })
             .catch(error => {
@@ -120,11 +120,13 @@
 
         // 更新购物车商品数量
         update_cart_count: function(goods_id, count, index) {
+
             //发送请求
             axios.put(this.host+'/cart/', {
-                    sku_id: this.cart[index].id,
+
+                    goods_id: this.goods_list[index].id,
                     count: count,
-                    selected: this.cart[index].selected
+                    selected: this.goods_list[index].selected
                 }, {
                     headers:{
                         'Authorization': 'JWT ' + this.token
@@ -132,7 +134,7 @@
                     withCredentials: true
                 })
                 .then(response => {
-                    this.cart[index].count = response.data.count;
+                    this.goods_list[index].count = response.data.count;
                 })
                 .catch(error => {
                     if ('non_field_errors' in error.response.data) {
@@ -149,7 +151,7 @@
             //发送请求
             var config = {
                 data: {  // 注意：delete方法参数的传递方式
-                    sku_id: this.cart[index].id
+                    sku_id: this.goods_list[index].id
                 },
                 headers:{
                     'Authorization': 'JWT ' + this.token
@@ -159,7 +161,7 @@
             axios.delete(this.host+'/cart/', config)
                 .then(response => {
                     // 删除数组中的下标为index的元素
-                    this.cart.splice(index, 1);
+                    this.goods_list.splice(index, 1);
                 })
                 .catch(error => {
                     console.log(error.response.data);

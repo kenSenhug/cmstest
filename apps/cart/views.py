@@ -95,9 +95,11 @@ class CartView(APIView):
             # 给sku对象 新增count和selected属性
             sku.count = cart.get(sku.id).get('count')
             sku.selected = cart.get(sku.id).get('selected')
+            # sku.amount = sku.count*sku.sell_price
 
         # 序列化商品对象并响应数据
         s = CartSKUSerializer(goods, many=True)
+
         return Response(s.data)
 
     def put(self, request):
@@ -199,5 +201,35 @@ class CartSelectAllView(APIView):
         else:  # 取消全选
             redis_conn.srem('cart_selected_%s' % user.id, *sku_id_list)
         return Response({'message': 'OK'})
+
+
+class CartCountView(APIView):
+
+    def perform_authentication(self, request):
+        """
+        drf框架在视图执行前会调用此方法进行身份认证(jwt认证)
+        如果认证不通过,则会抛异常返回401状态码
+        问题: 抛异常会导致视图无法执行
+        解决: 捕获异常即可
+        """
+        try:
+            super().perform_authentication(request)
+        except Exception:
+            pass
+
+    def get(self, request):
+
+        user = request.user
+
+        strict_redis = get_redis_connection('cart')  # type: StrictRedis
+
+        dic = strict_redis.hgetall('cart_%s' % user.id)
+        total_count = 0
+        # if user.is_authenticated():
+        for value in dic.values():
+            total_count += int(value.decode())
+        return Response({'total_count': total_count})
+
+
 
 

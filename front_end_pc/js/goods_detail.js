@@ -57,8 +57,8 @@ var vm = new Vue({
             if (this.is_login()) {  // 已经登录
                 //发送登录请求
                 let data = {
-                sku_id: parseInt(this.sku_id),
-                count: this.sku_count
+                goods_id: parseInt(this.goods_id),
+                count: this.count
             };
             let config = {
                 headers: { // 通过请求头往服务器传递登录状态

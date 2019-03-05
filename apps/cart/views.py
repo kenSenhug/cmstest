@@ -193,7 +193,6 @@ class CartSelectAllView(APIView):
         redis_conn = get_redis_connection('cart')
         # hkeys cart_1    (1, 2)    获取hash所有的字段名 
         sku_id_list = redis_conn.hkeys('cart_%s' % user.id)  # （1, 2） bytes
-
         if selected:  # 全选
 
             redis_conn.sadd('cart_selected_%s' % user.id, *sku_id_list)

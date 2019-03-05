@@ -42,7 +42,6 @@ class CartView(APIView):
         goods_id = s.validated_data.get('goods_id')
         count = s.validated_data.get('count')
         selected = s.validated_data.get('selected')
-
         # 方式2:
         # sku_id = request.data.get('sku_id')
         # count = request.data.get('count')

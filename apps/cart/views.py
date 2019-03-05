@@ -195,6 +195,7 @@ class CartSelectAllView(APIView):
         sku_id_list = redis_conn.hkeys('cart_%s' % user.id)  # （1, 2） bytes
 
         if selected:  # 全选
+
             redis_conn.sadd('cart_selected_%s' % user.id, *sku_id_list)
         else:  # 取消全选
             redis_conn.srem('cart_selected_%s' % user.id, *sku_id_list)

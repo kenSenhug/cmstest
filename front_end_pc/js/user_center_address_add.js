@@ -29,23 +29,42 @@ var vm = new Vue({
     },
 
     mounted: function () {
-        // 获取所有的省份,发送请求
-		
-        
+        // 获取所有的省份
+        axios.get(this.host + '/areas/')
+            .then(response => {
+                this.provinces = response.data;
+            })
+            .catch(error => {
+                alert(error.response.data);
+            });
     },
 
     watch: {
         // 监听省份的改变, 查询对应的城市并刷新界面显示
         'form_address.province_id': function () {
             if (this.form_address.province_id) {
-                //发送请求
+                axios.get(this.host + '/areas/' + this.form_address.province_id + '/')
+                    .then(response => {
+                        this.cities = response.data.subs;
+                    })
+                    .catch(error => {
+                        console.log(error.response.data);
+                        this.cities = [];
+                    });
             }
         },
 
         // 监听城市的改变, 查询对应的区县并刷新界面显示
         'form_address.city_id': function () {
             if (this.form_address.city_id) {
-               //发送请求
+                axios.get(this.host + '/areas/' + this.form_address.city_id + '/')
+                    .then(response => {
+                        this.districts = response.data.subs;
+                    })
+                    .catch(error => {
+                        console.log(error.response.data);
+                        this.districts = [];
+                    });
             }
         }
     },
@@ -109,8 +128,19 @@ var vm = new Vue({
                 alert('信息填写有误！');
             } else {
                 this.form_address.title = this.form_address.receiver;
-                // 新增地址,发送请求
-                
+                // 新增地址
+                axios.post(this.host + '/addresses/', this.form_address, {
+                        headers: {
+                                'Authorization': 'JWT ' + this.token
+                            },
+                        })
+                    .then(response => {
+                        // 跳转回地址列表界面
+                        location.href = '/user_center_address.html'
+                    })
+                    .catch(error => {
+                        console.log(error.response.data);
+                    })
             }
         },
     }

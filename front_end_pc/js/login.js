@@ -40,7 +40,41 @@ var vm = new Vue({
 
             if (this.error_username === false
                 && this.error_pwd === false) {
-				//发送登录请求
+
+                var url = this.host+'/authorizations/';
+                var params = {
+                    username: this.username,
+                    password: this.password
+                };
+
+                axios.post(url, params, {withCredentials: true})
+                    .then(response => {
+                        // 使用浏览器本地存储保存token
+                        if (this.remember) {
+                            // 记住登录
+                            sessionStorage.clear();
+                            localStorage.token = response.data.token;
+                            localStorage.user_id = response.data.user_id;
+                            localStorage.username = response.data.username;
+
+                        } else {
+                            // 未记住登录
+                            localStorage.clear();
+                            sessionStorage.token = response.data.token;
+                            sessionStorage.user_id = response.data.user_id;
+                            sessionStorage.username = response.data.username;
+                        }
+
+                        // 跳转页面
+                        var return_url = get_query_string('next');
+                        if (!return_url) {
+                            return_url = '/index.html';
+                        }
+                        location.href = return_url;
+
+                    }) .catch(error => {
+                        this.error_msg = '用户名或密码错误';
+                    })
             }
         },
     }

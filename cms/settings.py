@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/1.11/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.11/ref/settings/
 """
-
+import datetime
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -26,7 +26,7 @@ SECRET_KEY = '=7r&wn97h6=6xpk4w%f$0$9&_73d=(ztgly@h!^32=rlh7%0++'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1']
 
 
 # Application definition
@@ -38,28 +38,27 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    
-    'rest_framework',
     'corsheaders',
+    'rest_framework',
     'users',
     'cart',
     'goods',
     'news',
+
 ]
-CORS_ORIGIN_WHITELIST = (
-    # 指定可以跨域访问当前服务器
-    '127.0.0.1:8080',
-)
-CORS_ALLOW_CREDENTIALS = True
+
+
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
+
 ]
 
 ROOT_URLCONF = 'cms.urls'
@@ -164,4 +163,27 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
 STATIC_URL = '/static/'
+
 AUTH_USER_MODEL = 'users.User'
+
+CORS_ORIGIN_WHITELIST = (
+    # 指定可以跨域访问当前服务器
+    '127.0.0.1:8080',
+)
+CORS_ALLOW_CREDENTIALS = True
+
+JWT_AUTH = {
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(days=1),
+    'JWT_RESPONSE_PAYLOAD_HANDLER': 'users.utils.jwt_response_payload_handler',
+}
+AUTHENTICATION_BACKENDS = [
+    'users.utils.UsernameMobileAuthBackend',
+]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication', #session认证
+        'rest_framework.authentication.BasicAuthentication', #用户密码认证
+    ),
+}

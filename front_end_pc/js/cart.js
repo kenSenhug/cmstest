@@ -52,16 +52,45 @@
 
     methods: {
         // 全选和全不选
-        on_select_all: function() {
-            let select = !this.select_all;
-            for (let i = 0; i < this.goods_list.length; i++) {
-                this.goods_list[i].selected = select;
-            }
-        },
+        on_selected_all: function(){
+            var selected = !this.selected_all;
+            // 发请求保存商品的勾选状态
+            var data = {
+                selected: selected
+            };
+            axios.put(this.host + '/cart/selection/', data, {
+                    responseType: 'json',
+                    headers:{
+                        'Authorization': 'JWT ' + this.token
+                    },
+                    withCredentials: true // 跨域请求传递cookie给服务器
+                })
+                .then(response => {
+                    // 设置商品全选或全不选
+                    for (var i=0; i<this.cart.length;i++){
+                        this.cart[i].selected = selected;
+                    }
+                })
+                .catch(error => {
+                    console.log(error.response.data);
+                })
+            },
 
         // 获取购物车商品数据
         get_cart_goods: function () {
-           //发送请求
+           axios.get(this.host + '/cart/')
+            .then(response => {
+                this.cart = response.data;
+
+                // 计算每件商品的小计金额: 小计金额 amount = 单价 * 数量
+                for (var i = 0; i < this.cart.length; i++) {
+                    this.cart[i].amount = (parseFloat(this.cart[i].price)
+                        * this.cart[i].count).toFixed(2);  // toFixed： 保留两位小数点
+                }
+            })
+            .catch(error => {
+                console.log(error.response.data);
+            })
         },
 
         // 点击增加购买数量
@@ -92,11 +121,49 @@
         // 更新购物车商品数量
         update_cart_count: function(goods_id, count, index) {
             //发送请求
+            axios.put(this.host+'/cart/', {
+                    sku_id: this.cart[index].id,
+                    count: count,
+                    selected: this.cart[index].selected
+                }, {
+                    headers:{
+                        'Authorization': 'JWT ' + this.token
+                    },
+                    withCredentials: true
+                })
+                .then(response => {
+                    this.cart[index].count = response.data.count;
+                })
+                .catch(error => {
+                    if ('non_field_errors' in error.response.data) {
+                        alert(error.response.data.non_field_errors[0]);
+                    } else {
+                        alert('修改购物车失败');
+                    }
+                    console.log(error.response.data);
+                })
         },
 
         // 删除购物车中的一个商品
         delete_goods: function(index){
             //发送请求
+            var config = {
+                data: {  // 注意：delete方法参数的传递方式
+                    sku_id: this.cart[index].id
+                },
+                headers:{
+                    'Authorization': 'JWT ' + this.token
+                },
+                withCredentials: true
+            }
+            axios.delete(this.host+'/cart/', config)
+                .then(response => {
+                    // 删除数组中的下标为index的元素
+                    this.cart.splice(index, 1);
+                })
+                .catch(error => {
+                    console.log(error.response.data);
+                })
         },
 
         // 清空购物车

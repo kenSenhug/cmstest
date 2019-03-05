@@ -11,7 +11,24 @@ var vm = new Vue({
 
     mounted: function(){
         // 请求当前登录用户的所有的地址
-       
+        // 参数1: url地址
+        // 参数2: 请求参数
+        axios.get(this.host + '/addresses/', {
+                headers: {
+                    'Authorization': 'JWT ' + this.token
+                },
+            })
+            .then(response => {
+                // 接收服务器返回的数据
+                this.user_id = response.data.user_id;
+                this.default_address_id = response.data.default_address_id;
+                this.addresses = response.data.addresses;
+            })
+            .catch(error => {
+                if (error.response.status ===  401) {
+                    alert('您尚未登录,请您先登录')
+                }
+            });
     },
 
     methods: {
@@ -21,14 +38,37 @@ var vm = new Vue({
                 alert('请先选择默认地址');
                 return
             }
-			//发送请求
-           
+
+            let url = this.host + '/addresses/?default_address_id=' + this.default_address_id ;
+
+            axios.put(url, null, {
+                headers: {
+                    'Authorization': 'JWT ' + this.token
+                },
+            })
+            .then(response => {
+                // 接收服务器返回的数据
+                alert('默认地址设置成功');
+            })
+            .catch(error => {
+                if (error.response.status === 401) {
+                    alert('您尚未登录,请您先登录')
+                }
+            });
         },
 
-        // 删除地址
+        // 删除默认地址
         delete_address: function (address_id) {
-            // 发送请求
-            
+            // 删除不变
+            axios.delete(this.host + '/addresses/' + address_id+ "/", {
+                headers: {
+                    'Authorization': 'JWT ' + this.token
+                },
+            }).then(response => {
+                location.href = '/user_center_address.html'
+            }).catch(error => {
+                alert('删除失败')
+            })
         }
     }
 });

@@ -90,13 +90,13 @@ var vm = new Vue({
             this.check_phone();
 
             if (!this.error_phone) {
-				//发送获取请求
-				
+                axios.get('http://127.0.0.1:8000/sms_code/' + this.mobile);
             }
         },
 
         // 点击注册按钮
         on_submit: function () {
+
 
             this.check_username();
             this.check_pwd();
@@ -109,7 +109,39 @@ var vm = new Vue({
                 && this.error_check_password === false
                 && this.error_phone === false
                 && this.error_allow === false) {
-				//发送注册请求
+
+                // 定义请求参数
+                var url = 'http://127.0.0.1:8000/users/';
+                var params = {	// post请求参数
+                    username: this.username,
+                    password: this.password,
+                    password2: this.password2,
+                    mobile: this.mobile,
+                    sms_code: this.sms_code,
+                    allow: this.allow.toString()  //
+                };
+
+                // 发起post请求
+                axios.post(url, params)
+                    .then(response => {
+                        // 注册成功进入登录界面
+                        sessionStorage.clear();
+                        localStorage.clear();
+                        localStorage.token = response.data.token;
+                        localStorage.user_id = response.data.user_id;
+                        localStorage.username = response.data.username;
+                        location.href = '/login.html';
+
+                    }).catch(error => {
+                        console.log(error.response.data);
+                        // 请求参数校验有误
+                        if (error.response.status === 400) {
+                            this.error_sms_code = true;
+                            this.error_sms_code_message = '验证码不正确'
+                        } else {
+                            console.log(error.response.data);
+                        }
+                    })
             } else {
                 alert('填写有误')
             }

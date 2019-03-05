@@ -7,7 +7,7 @@
     },
 
     computed: {
-        select_all: function() {
+        selected_all: function() {
             for (let i = 0; i < this.goods_list.length; i++) {
                 let goods = this.goods_list[i];
                 // 重新计算小计金额, 自动刷新界面显示
@@ -84,7 +84,7 @@
 
                 // 计算每件商品的小计金额: 小计金额 amount = 单价 * 数量
                 for (var i = 0; i < this.goods_list.length; i++) {
-                    this.goods_list[i].amount = (parseFloat(this.goods_list[i].price)
+                    this.goods_list[i].amount = (parseFloat(this.goods_list[i].sell_price)
                         * this.goods_list[i].count).toFixed(2);  // toFixed： 保留两位小数点
                 }
             })
@@ -164,6 +164,31 @@
                     this.goods_list.splice(index, 1);
                 })
                 .catch(error => {
+                    console.log(error.response.data);
+                })
+        },
+        // 更新购物车勾选状态
+        update_selected: function(index) {
+            axios.put(this.host+'/cart/', {
+                    goods_id: this.goods_list[index].id,
+                    count: this.goods_list[index].count,
+                    selected: this.goods_list[index].selected
+                }, {
+                    headers: {
+                        'Authorization': 'JWT ' + this.token
+                    },
+                    responseType: 'json',
+                    withCredentials: true
+                })
+                .then(response => {
+                    this.cart[index].selected = response.data.selected;
+                })
+                .catch(error => {
+                    if ('non_field_errors' in error.response.data) {
+                        alert(error.response.data.non_field_errors[0]);
+                    } else {
+                        alert('修改购物车失败');
+                    }
                     console.log(error.response.data);
                 })
         },

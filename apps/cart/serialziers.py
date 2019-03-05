@@ -9,7 +9,7 @@ class CartAddSerializer(serializers.Serializer):
 
     goods_id = serializers.IntegerField(label='商品id', min_value=1)
     count = serializers.IntegerField(label='数量', min_value=1)
-    selected = serializers.BooleanField(label='勾选状态', default=True)
+    selected = serializers.BooleanField(label='勾选状态', default=False)
 
     def validate_sku_id(self, value):
         try:

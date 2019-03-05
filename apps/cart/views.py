@@ -163,7 +163,6 @@ class CartView(APIView):
         # 响应数据
         return response
 
-
 class CartSelectAllView(APIView):
     """
     购物车全选和全不选
